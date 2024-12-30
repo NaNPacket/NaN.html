@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        // Tam ekran yapma
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Rastgele karakterler
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()';
+        const charArray = chars.split('');
+
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+
+        // Her sütun için Y pozisyonları
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        function draw() {
+            // Yarı saydam siyah arkaplan ekleyerek silinme efekti
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Yeşil renk
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            // Her sütun için
+            for (let i = 0; i < drops.length; i++) {
+                // Rastgele karakter seç
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                
+                // Karakteri çiz
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Karakter en alta ulaştığında veya rastgele olarak
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                drops[i]++;
+            }
+        }
+
+        // Pencere yeniden boyutlandırıldığında
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Animasyonu başlat
+        setInterval(draw, 33);
+    </script>
+</body>
+</html>
