@@ -1,73 +1,172 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body {
             margin: 0;
             overflow: hidden;
             background: black;
+            font-family: 'Courier New', monospace;
         }
         canvas {
             display: block;
+            filter: blur(0.5px);
+        }
+        #message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-size: 3em;
+            text-align: center;
+            z-index: 100;
+            text-shadow: 0 0 10px #ff0000;
+            letter-spacing: 5px;
+            opacity: 0;
+            animation: glitch 1s infinite;
+        }
+        .logo-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            width: 100%;
+            text-align: center;
+        }
+        .logo-wrapper {
+            display: inline-block;
+            margin: 20px;
+            position: relative;
+        }
+        .logo {
+            font-size: 80px;
+            color: #fff;
+            animation: flicker 0.5s infinite;
+            opacity: 0;
+        }
+        @keyframes flicker {
+            0% { opacity: 1; text-shadow: 0 0 20px #fff; }
+            50% { opacity: 0.8; text-shadow: 0 0 10px #fff; }
+            100% { opacity: 1; text-shadow: 0 0 20px #fff; }
+        }
+        @keyframes glitch {
+            0% { transform: translate(-50%, -50%) skew(0deg); }
+            20% { transform: translate(-52%, -50%) skew(-2deg); }
+            40% { transform: translate(-48%, -50%) skew(2deg); }
+            60% { transform: translate(-50%, -50%) skew(0deg); }
+            80% { transform: translate(-51%, -50%) skew(1deg); }
+            100% { transform: translate(-50%, -50%) skew(0deg); }
+        }
+        .warning {
+            color: #ff0000;
+            font-size: 0.8em;
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            display: none;
         }
     </style>
 </head>
 <body>
     <canvas id="matrix"></canvas>
+    <div id="message">*THEY ARE WATCHING US ALL*</div>
+    <div class="logo-container">
+        <div class="logo-wrapper">
+            <i class="logo fab fa-apple"></i>
+            <div class="warning">>_SYSTEM COMPROMISED</div>
+        </div>
+        <div class="logo-wrapper">
+            <i class="logo fab fa-microsoft"></i>
+            <div class="warning">>_ACCESS GRANTED</div>
+        </div>
+        <div class="logo-wrapper">
+            <i class="logo fab fa-meta"></i>
+            <div class="warning">>_SECURITY BREACH</div>
+        </div>
+    </div>
     <script>
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
+        const message = document.getElementById('message');
+        const logoContainer = document.querySelector('.logo-container');
 
-        // Tam ekran yapma
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Rastgele karakterler
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()';
+        const chars = '01アカサタナハマヤラワガザダバパイキシチニヒミリヰギジヂビピウクスツヌフムユルグズブヅプエケセテネヘメレヱゲゼデベペオコソトノホモヨロヲゴゾドボポヴッン※@#$%&!<>[]{}|=+?';
         const charArray = chars.split('');
 
-        const fontSize = 14;
+        const fontSize = 16;
         const columns = canvas.width / fontSize;
-
-        // Her sütun için Y pozisyonları
         const drops = [];
+
         for (let i = 0; i < columns; i++) {
-            drops[i] = 1;
+            drops[i] = Math.floor(Math.random() * -20);
         }
 
         function draw() {
-            // Yarı saydam siyah arkaplan ekleyerek silinme efekti
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Yeşil renk
             ctx.fillStyle = '#0F0';
             ctx.font = fontSize + 'px monospace';
 
-            // Her sütun için
             for (let i = 0; i < drops.length; i++) {
-                // Rastgele karakter seç
                 const text = charArray[Math.floor(Math.random() * charArray.length)];
-                
-                // Karakteri çiz
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
 
-                // Karakter en alta ulaştığında veya rastgele olarak
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                ctx.fillStyle = Math.random() > 0.99 ? '#FFF' : '#0F0';
+                ctx.fillText(text, x, y);
+
+                if (y > canvas.height && Math.random() > 0.99) {
                     drops[i] = 0;
                 }
-
                 drops[i]++;
             }
         }
 
-        // Pencere yeniden boyutlandırıldığında
+        setTimeout(() => {
+            message.style.display = 'block';
+            let opacity = 0;
+            const glitchInterval = setInterval(() => {
+                opacity += 0.1;
+                message.style.opacity = opacity;
+                message.style.textShadow = `${Math.random() * 10 - 5}px ${Math.random() * 10 - 5}px 10px #ff0000`;
+                if (opacity >= 1) clearInterval(glitchInterval);
+            }, 100);
+        }, 10000);
+
+        setTimeout(() => {
+            message.style.display = 'none';
+            logoContainer.style.display = 'block';
+            
+            const logos = document.querySelectorAll('.logo');
+            const warnings = document.querySelectorAll('.warning');
+            
+            logos.forEach((logo, index) => {
+                setTimeout(() => {
+                    logo.style.opacity = '1';
+                    warnings[index].style.display = 'block';
+                    setInterval(() => {
+                        logo.style.transform = `translate(${Math.random() * 4 - 2}px, ${Math.random() * 4 - 2}px)`;
+                    }, 100);
+                }, index * 1000);
+            });
+        }, 15000);
+
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
 
-        // Animasyonu başlat
         setInterval(draw, 33);
     </script>
 </body>
